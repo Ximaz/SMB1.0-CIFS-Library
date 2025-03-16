@@ -482,7 +482,8 @@ typedef enum e_smb_error_class
     ERRCMD = 0xFF,
 } smb_error_class_t;
 
-typedef enum e_smb_error_code {
+typedef enum e_smb_error_code
+{
     /** ERROR CODES FOR THE 'SUCCESS' ERROR CLASS : */
 
     /**
@@ -576,7 +577,7 @@ typedef enum e_smb_error_code {
     /**
      * @brief No (more) files found following a file search command.
      */
-    ERR_NO_FILE =0x0012,
+    ERR_NO_FILE = 0x0012,
 
     /**
      * @brief General error.
@@ -645,7 +646,7 @@ typedef enum e_smb_error_code {
     /**
      * @brief The file system does not support atomic changes to the lock type.
      */
-    ERR_ATOMIC_LOCKS_NOT_SUPPORTED=0x00AE,
+    ERR_ATOMIC_LOCKS_NOT_SUPPORTED = 0x00AE,
 
     /**
      * @brief Invalid named pipe.
@@ -2146,5 +2147,44 @@ typedef enum e_smb_trans2_set
      */
     SMB_SET_FILE_END_OF_FILE_INFO = 0x0104,
 } smb_trans2_set_t;
+
+typedef enum e_smb_data_buffer_format_code
+{
+    /**
+     * @brief A two-byte USHORT value indicating the length of the data buffer.
+     * The data buffer follows immediately after the length field.
+     */
+    DATA_BUFFER = 0x01,
+
+    /**
+     * @brief A null-terminated OEM_STRING.
+     *
+     * @note This format code is used only in the SMB_COM_NEGOTIATE command to
+     * identify SMB dialect strings.
+     */
+    DIALECT_STRING = 0x02,
+
+    /**
+     * @brief A null-terminated string representing a file system path.
+     *
+     * @note In the NT LAN Manager dialect, the string is of type SMB_STRING
+     * unless otherwise specified.
+     */
+    PATHNAME = 0x03,
+
+    /**
+     * @brief A null-terminated string.
+     *
+     * @note In the NT LAN Manager dialect, the string is of type SMB_STRING
+     * unless otherwise specified.
+     */
+    SMB_STRING = 0x04,
+
+    /**
+     * @brief A two-byte USHORT value indicating the length of the variable
+     * block. The variable block follows immediately after the length field.
+     */
+    VARIABLE_BLOCK = 0x05,
+} smb_data_buffer_format_code_t;
 
 #endif /* !__SMB_CIFS_H_ */
