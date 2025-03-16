@@ -1415,4 +1415,212 @@ typedef enum e_smb_nt_trans {
     NT_TRANSACT_QUERY_SECURITY_DESC = 0x0006,
 } smb_nt_trans_t;
 
+/**
+ * @brief FIND information levels are used in TRANS2_FIND_FIRST2 and
+ * TRANS2_FIND_NEXT2 subcommand requests to indicate the level of information
+ * that a server MUST respond with for each file matching the request's search
+ * criteria.
+ */
+typedef enum e_smb_trans2_find {
+    /**
+     * @brief Return creation, access, and last write timestamps, size and file
+     * attributes along with the file name.
+     */
+    SMB_INFO_STANDARD = 0x0001,
+
+    /**
+     * @brief Return the SMB_INFO_STANDARD data along with the size of a file's
+     * extended attributes (EAs).
+     */
+    SMB_INFO_QUERY_EA_SIZE = 0x0002,
+
+    /**
+     * @brief Return the SMB_INFO_QUERY_EA_SIZE data along with a specific list
+     * of a file's EAs. The requested EAs are provided in the Trans2_Data block
+     * of the request.
+     */
+    SMB_INFO_QUERY_EAS_FROM_LIST = 0x0003,
+
+    /**
+     * @brief Return 64-bit format versions of: creation, access, last write,
+     * and last attribute change timestamps; size. In addition, return extended
+     * file attributes and file name.
+     */
+    SMB_FIND_FILE_DIRECTORY_INFO = 0x0101,
+
+    /**
+     * @brief Returns the SMB_FIND_FILE_DIRECTORY_INFO data along with the size
+     * of a file's EAs.
+     */
+    SMB_FIND_FILE_FULL_DIRECTORY_INFO = 0x0102,
+
+    /**
+     * @brief Returns the name(s) of the file(s).
+     */
+    SMB_FIND_FILE_NAMES_INFO = 0x0103,
+
+    /**
+     * @brief Returns a combination of the data from
+     * SMB_FIND_FILE_FULL_DIRECTORY_INFO and SMB_FIND_FILE_NAMES_INFO.
+     */
+    SMB_FIND_FILE_BOTH_DIRECTORY_INFO = 0x0104,
+} smb_trans2_find_t;
+
+/**
+ * @brief QUERY_FS information levels are used in TRANS2_QUERY_FS_INFORMATION
+ * subcommand requests to indicate the level of information that a server MUST
+ * respond with for the underlying object store indicated in the request.
+ */
+typedef enum e_smb_trans2_query_fs {
+    /**
+     * @brief Query file system allocation unit information.
+     */
+    SMB_INFO_ALLOCATION = 0x0001,
+
+    /**
+     * @brief Query volume name and serial number.
+     */
+    SMB_INFO_VOLUME  = 0x0002,
+
+    /**
+     * @brief Query the creation timestamp, serial number, and Unicode-encoded
+     * volume label.
+     */
+    SMB_QUERY_FS_VOLUME_INFO = 0x0102,
+
+    /**
+     * @brief Query 64-bit file system allocation unit information.
+     */
+    SMB_QUERY_FS_SIZE_INFO = 0x0103,
+
+    /**
+     * @brief Query a file system's underlying device type and characteristics.
+     */
+    SMB_QUERY_FS_DEVICE_INFO = 0x0104,
+
+    /**
+     * @brief Query file system attributes.
+     */
+    SMB_QUERY_FS_ATTRIBUTE_INFO = 0x0105,
+} smb_trans2_query_fs_t;
+
+/**
+ * @brief QUERY information levels are used in TRANS2_QUERY_PATH_INFORMATION
+ * and TRANS2_QUERY_FILE_INFORMATION subcommand requests to indicate the level
+ * of information that a server MUST respond with for the file or directory
+ * indicated in the request.
+ */
+typedef enum e_smb_trans2_query {
+    /**
+     * @brief Query creation, access, and last write timestamps, size and file
+     * attributes.
+     */
+    SMB_INFO_STANDARD = 0x0001,
+
+    /**
+     * @brief Query the SMB_INFO_STANDARD data along with the size of the
+     * file's extended attributes (EAs).
+     */
+    SMB_INFO_QUERY_EA_SIZE = 0x0002,
+
+    /**
+     * @brief Query a file's specific EAs by attribute name.
+     */
+    SMB_INFO_QUERY_EAS_FROM_LIST  = 0x0003,
+
+    /**
+     * @brief Query all of a file's EAs.
+     */
+    SMB_INFO_QUERY_ALL_EAS = 0x0004,
+
+    /**
+     * @brief Validate the syntax of the path provided in the request. Not
+     * supported for TRANS2_QUERY_FILE_INFORMATION.
+     */
+    SMB_INFO_IS_NAME_VALID = 0x0006,
+
+    /**
+     * @brief Query 64-bit create, access, write, and change timestamps along
+     * with extended file attributes.
+     */
+    SMB_QUERY_FILE_BASIC_INFO = 0x0101,
+
+    /**
+     * @brief Query size, number of links, if a delete is pending, and if the
+     * path is a directory.
+     */
+    SMB_QUERY_FILE_STANDARD_INFO = 0x0102,
+
+    /**
+     * @brief Query the size of the file's EAs.
+     */
+    SMB_QUERY_FILE_EA_INFO  = 0x0103,
+
+    /**
+     * @brief Query the long file name in Unicode format.
+     */
+    SMB_QUERY_FILE_NAME_INFO = 0x0104,
+
+    /**
+     * @brief Query the SMB_QUERY_FILE_BASIC_INFO,
+     * SMB_QUERY_FILE_STANDARD_INFO, SMB_QUERY_FILE_EA_INFO, and
+     * SMB_QUERY_FILE_NAME_INFO data as well as access flags, access mode, and
+     * alignment information in a single request.
+     */
+    SMB_QUERY_FILE_ALL_INFO  = 0x0107,
+
+    /**
+     * @brief Query the 8.3 file name.
+     */
+    SMB_QUERY_FILE_ALT_NAME_INFO = 0x0108,
+
+    /**
+     * @brief Query file stream information.
+     */
+    SMB_QUERY_FILE_STREAM_INFO = 0x0109,
+
+    /**
+     * @brief Query file compression information.
+     */
+    SMB_QUERY_FILE_COMPRESSION_INFO = 0x010B,
+} smb_trans2_query_t;
+
+/**
+ * @brief SET information levels are used in TRANS2_SET_PATH_INFORMATION and
+ * TRANS2_SET_FILE_INFORMATION subcommand requests to indicate what level of
+ * information is being set on the file or directory in the request.
+ */
+typedef enum e_smb_trans2_set {
+    /**
+     * @brief Set creation, access, and last write timestamps.
+     */
+    SMB_INFO_STANDARD = 0x0001,
+
+    /**
+     * @brief Set a specific list of extended attributes (EAs).
+     */
+    SMB_INFO_SET_EAS = 0x0002,
+
+    /**
+     * @brief Set 64-bit create, access, write, and change timestamps along
+     * with extended file attributes.
+     */
+    SMB_SET_FILE_BASIC_INFO = 0x0101,
+
+    /**
+     * @brief Set whether or not the file is marked for deletion.
+     */
+    SMB_SET_FILE_DISPOSITION_INFO  = 0x0102,
+
+    /**
+     * @brief Set file allocation size.
+     */
+    SMB_SET_FILE_ALLOCATION_INFO = 0x0103,
+
+    /**
+     * @brief Set file EOF offset.
+     */
+    SMB_SET_FILE_END_OF_FILE_INFO = 0x0104,
+} smb_trans2_set_t;
+
 #endif /* !__SMB_CIFS_H_ */
