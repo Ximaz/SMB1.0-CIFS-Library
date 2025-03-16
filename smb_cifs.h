@@ -2366,7 +2366,8 @@ typedef enum e_smb_flags2
 /**
  * @brief In the case that security signatures are negotiated :
  */
-typedef struct s_smb_com_negociate_security_features {
+typedef struct s_smb_com_negociate_security_features
+{
     /**
      * @brief If SMB signing has been negotiated, this field MUST contain an
      * 8-byte cryptographic message signature that can be used to detect
@@ -2380,7 +2381,8 @@ typedef struct s_smb_com_negociate_security_features {
  * @brief In the case that CIFS is being transported over a connectionless
  * transport :
  */
-typedef struct s_smb_security_features {
+typedef struct s_smb_security_features
+{
     /**
      * @brief An encryption key used for validating messages over
      * connectionless transports.
@@ -2488,7 +2490,8 @@ typedef struct s_smb_message_header
  * measured as a count of byte pairs.
  * The general format of the parameter block is as follows.
  */
-typedef struct s_smb_parameters {
+typedef struct s_smb_parameters
+{
     /**
      * @brief The size, in two-byte words, of the Words field. This field can
      * be zero, indicating that the Words field is empty. Note that the size of
@@ -2503,6 +2506,97 @@ typedef struct s_smb_parameters {
      * included.
      */
     USHORT words[SMB_PARAMETERS_MAX_WORDS];
-} smb_parameters_t;
+} smb_message_parameters_t;
+
+#define SMB_DATA_MAX_BYTES ((1 << 16) - 1)
+
+/**
+ * @brief The general structure of the data block is similar to that of the
+ * Parameter block, except that the length of the buffer portion is measured in
+ * bytes.
+ */
+typedef struct s_smb_data
+{
+    /**
+     * @brief The size, in bytes, of the Bytes field. This field can be 0x0000,
+     * indicating that the Bytes field is empty. Because the
+     * SMB_Parameters.Words field is unaligned and the SMB_Data.ByteCount field
+     * is two bytes in size, the first byte of SMB_Data.Bytes is also
+     * unaligned.
+     */
+    USHORT byte_count;
+
+    /**
+     * @brief The message-specific data structure. The size of this field MUST
+     * be ByteCount bytes. If ByteCount is 0x0000, this field is not included.
+     */
+    UCHAR bytes[SMB_DATA_MAX_BYTES];
+} smb_message_data_t;
+
+/**
+ * @brief SMB Messages are divisible into three parts:
+ * - A fixed-length header
+ * - A variable length parameter block
+ * - A variable length data block
+ * The header identifies the message as an SMB message, specifies the command
+ * to be executed, and provides context. In a response message, the header also
+ * includes status information that indicates whether (and how) the command
+ * succeeded or failed.
+ * The parameter block is a short array of two-byte values (words), while the
+ * data block is an array of up to 64 KB in size. The structure and contents of
+ * these blocks are specific to each SMB message.
+ * SMB messages are structured this way because the protocol was originally
+ * conceived of as a rudimentary remote procedure call system. The parameter
+ * values were meant to represent the parameters passed into a function. The
+ * data section would contain larger structures or data buffers, such as the
+ * block of data to be written using an SMB_COM_WRITE command. Although the
+ * protocol has evolved over time, this differentiation has been generally
+ * maintained.
+ */
+typedef struct s_smb_message {
+    smb_message_header_t header;
+    smb_message_parameters_t parameter_block;
+    smb_message_data_t data_block;
+} smb_message_t;
+
+/**
+ * @brief Batched messages using the AndX construct were introduced in the LAN
+ * Manager 1.0 dialect. Batched messages reduce the number of messages required
+ * to complete a series of commands by sending multiple command requests or
+ * responses in a single message. SMB commands that apply the AndX construct
+ * are known as "AndX Commands", and are identified by the NT LAN Manager
+ * convention of appending "_ANDX" to the command name. Messages of this type
+ * are known as AndX Messages.
+ * In AndX Messages, only one SMB Header is sent. The header is then followed
+ * by zero or more Parameter and Data block pairs, each corresponding to an
+ * additional command request/response. There is no limit on the number of
+ * block pairs in a message specifically, only on the total message size. The
+ * total size of a Batched Message MUST NOT exceed the negotiated
+ * MaxBufferSize. AndX Messages contain a construct, conceptually similar to a
+ * linked-list, that is used to connect the batched block pairs. The resulting
+ * list is referred to as an AndX Chain. The structure of this construct is
+ * shown below.
+ */
+typedef struct s_smb_andx
+{
+    /**
+     * @brief The command code associated with the next block pair in the AndX
+     * Chain.
+     */
+    UCHAR andx_command;
+
+    /**
+     * @brief This field is reserved and MUST be 0x00.
+     */
+    UCHAR andx_reserved;
+
+    /**
+     * @brief The offset in bytes, relative to the start of the SMB Header, of
+     * the next Parameter block in the AndX Message. This offset is independent
+     * of any other size parameters or offsets within the command. This offset
+     * can point to a location past the end of the current block pair.
+     */
+    USHORT andx_offset;
+} smb_andx_t;
 
 #endif /* !__SMB_CIFS_H_ */
