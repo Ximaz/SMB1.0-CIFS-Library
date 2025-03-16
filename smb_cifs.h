@@ -5,6 +5,7 @@ typedef unsigned char UCHAR;
 typedef unsigned long ULONG;
 typedef unsigned short USHORT;
 typedef int DWORD;
+typedef int SMB_ERROR;
 
 #define SMB_GEA_ATTR_NAME_MAX_LEN (1 << 8) - 1
 #define SMB_FEA_ATTR_NAME_MAX_LEN SMB_GEA_ATTR_NAME_MAX_LEN
@@ -2186,5 +2187,293 @@ typedef enum e_smb_data_buffer_format_code
      */
     VARIABLE_BLOCK = 0x05,
 } smb_data_buffer_format_code_t;
+
+/**
+ * @
+ */
+typedef enum e_smb_flags
+{
+    /**
+     * @brief This bit is set (1) in the SMB_COM_NEGOTIATE (0x72) Response if
+     * the server supports SMB_COM_LOCK_AND_READ (0x13) and
+     * SMB_COM_WRITE_AND_UNLOCK (0x14) commands.
+     */
+    SMB_FLAGS_LOCK_AND_READ_OK = (1 << 0),
+
+    /**
+     * @brief When set (on an SMB request being sent to the server), the client
+     * guarantees that there is a receive buffer posted such that a send
+     * without acknowledgment can be used by the server to respond to the
+     * client's request. This behavior is specific to an obsolete transport.
+     * This bit MUST be set to zero by the client and MUST be ignored by the
+     * server.
+     *
+     * @note Obselete.
+     */
+    SMB_FLAGS_BUF_AVAILABLE = (1 << 1),
+
+    /**
+     * @brief This flag MUST be set to zero by the client and MUST be ignored
+     * by the server.
+     */
+    RESERVED = (1 << 2),
+
+    /**
+     * @brief If this bit is set then all pathnames in the SMB SHOULD be
+     * treated as case-insensitive.
+     *
+     * @note Obselete.
+     */
+    SMB_FLAGS_CASE_INSENSITIVE = (1 << 3),
+
+    /**
+     * @brief When set in session setup, this bit indicates that all paths sent
+     * to the server are already in canonical format. That is, all file and
+     * directory names are composed of valid file name characters in all
+     * upper-case, and that the path segments are separated by backslash
+     * characters ('\').
+     *
+     * @note Obselescent.
+     */
+    SMB_FLAGS_CANONICALIZED_PATHS = (1 << 4),
+
+    /**
+     * @brief This bit has meaning only in the deprecated SMB_COM_OPEN (0x02)
+     * Request, SMB_COM_CREATE (0x03) Request, and SMB_COM_CREATE_NEW (0x0F)
+     * Request messages, where it is used to indicate that the client is
+     * requesting an Exclusive OpLock. It SHOULD be set to zero by the client,
+     * and ignored by the server, in all other SMB requests. If the server
+     * grants this OpLock request, then this bit SHOULD remain set in the
+     * corresponding response SMB to indicate to the client that the OpLock
+     * request was granted.
+     *
+     * @note Obselescent.
+     */
+    SMB_FLAGS_OPLOCK = (1 << 5),
+
+    /**
+     * @brief This bit has meaning only in the deprecated SMB_COM_OPEN (0x02)
+     * Request, SMB_COM_CREATE (0x03) Request, and SMB_COM_CREATE_NEW (0x0F)
+     * Request messages, where it is used to indicate that the client is
+     * requesting a Batch OpLock. It SHOULD be set to zero by the client, and
+     * ignored by the server, in all other SMB requests. If the server grants
+     * this OpLock request, then this bit SHOULD remain set in the
+     * corresponding response SMB to indicate to the client that the OpLock
+     * request was granted. If the SMB_FLAGS_OPLOCK bit is clear (0), then the
+     * SMB_FLAGS_OPBATCH bit is ignored.
+     *
+     * @note Obselescent.
+     */
+    SMB_FLAGS_OPBATCH = (1 << 6),
+
+    /**
+     * @brief When on, this message is being sent from the server in response
+     * to a client request. The Command field usually contains the same value
+     * in a protocol request from the client to the server as in the matching
+     * response from the server to the client. This bit unambiguously
+     * distinguishes the message as a server response.
+     */
+    SMB_FLAGS_REPLY = (1 << 7),
+} smb_flags_t;
+
+typedef enum e_smb_flags2
+{
+    /**
+     * @brief If the bit is set, the message MAY contain long file names.
+     * If the bit is clear then file names in the message MUST adhere to the
+     * 8.3 naming convention.
+     * If set in a client request for directory enumeration, the server MAY
+     * return long names (that is, names that are not 8.3 names) in the
+     * response to this request. If not set in a client request for directory
+     * enumeration, the server MUST return only 8.3 names in the response to
+     * this request. This flag indicates that in a direct enumeration request,
+     * paths returned by the server are not restricted to 8.3 names format.
+     * This bit field SHOULD be set to 1 when the negotiated dialect is
+     * LANMAN2.0 or later.
+     */
+    SMB_FLAGS2_LONG_NAMES = (1 << 0),
+
+    /**
+     * @brief If the bit is set, the client is aware of extended
+     * attributes (EAs).
+     * The client MUST set this bit if the client is aware of extended
+     * attributes. In response to a client request with this flag set, a server
+     * MAY include extended attributes in the response. This bit field SHOULD
+     * be set to 1 when the negotiated dialect is LANMAN2.0 or later.
+     */
+    SMB_FLAGS2_EAS = (1 << 1),
+
+    /**
+     * @brief If set by the client, the client is requesting signing (if signing
+     * is not yet active) or the message being sent is signed. This bit is used
+     * on the SMB header of an SMB_COM_SESSION_SETUP_ANDX client request to
+     * indicate that the client supports signing and that the server can choose
+     * to enforce signing on the connection based on its configuration.
+     * To turn on signing for a connection, the server MUST set this flag and
+     * also sign the SMB_COM_SESSION_SETUP_ANDX Response, after which all of
+     * the traffic on the connection (except for OpLock Break notifications)
+     * MUST be signed. In the SMB header of other CIFS client requests, the
+     * setting of this bit indicates that the packet has been signed. This bit
+     * field SHOULD be set to 1 when the negotiated dialect is NT LANMAN or
+     * later.
+     */
+    SMB_FLAGS2_SMB_SECURITY_SIGNATURE = (1 << 2),
+
+    /**
+     * @brief Reserved but not implemented.
+     *
+     * @note Not implemented.
+     */
+    SMB_FLAGS2_IS_LONG_NAME = (1 << 6),
+
+    /**
+     * @brief If the bit is set, any pathnames in this SMB SHOULD be resolved
+     * in the Distributed File System (DFS).
+     */
+    SMB_FLAGS2_DFS = (1 << 12),
+
+    /**
+     * @brief This flag is useful only on a read request. If the bit is set,
+     * then the client MAY read the file if the client does not have read
+     * permission but does have execute permission. This bit field SHOULD be
+     * set to 1 when the negotiated dialect is LANMAN2.0 or later. This flag is
+     * also known as SMB_FLAGS2_READ_IF_EXECUTE.
+     */
+    SMB_FLAGS2_PAGING_IO = (1 << 13),
+
+    /**
+     * @brief If this bit is set in a client request, the server MUST return
+     * errors as 32-bit NTSTATUS codes in the response. If it is clear, the
+     * server SHOULD return errors in SMBSTATUS format.
+     * If this bit is set in the server response, the Status field in the
+     * header is formatted as an NTSTATUS code; else, it is in SMBSTATUS
+     * format.
+     */
+    SMB_FLAGS2_NT_STATUS = (1 << 14),
+
+    /**
+     * @brief If set in a client request or server response, each field that
+     * contains a string in this SMB message MUST be encoded as an array of
+     * 16-bit Unicode characters, unless otherwise specified.
+     *
+     * If this bit is clear, each of these fields MUST be encoded as an array
+     * of OEM characters. This bit field SHOULD be set to 1 when the negotiated
+     * dialect is NT LANMAN.
+     */
+    SMB_FLAGS2_UNICODE = (1 << 15)
+} smb_flags2_t;
+
+/**
+ * @brief In the case that security signatures are negotiated :
+ */
+typedef struct s_smb_com_negociate_security_features {
+    /**
+     * @brief If SMB signing has been negotiated, this field MUST contain an
+     * 8-byte cryptographic message signature that can be used to detect
+     * whether the message was modified while in transit. The use of message
+     * signing is mutually exclusive with connectionless transport.
+     */
+    UCHAR security_signature[8];
+} smb_com_negociate_security_features_t;
+
+/**
+ * @brief In the case that CIFS is being transported over a connectionless
+ * transport :
+ */
+typedef struct s_smb_security_features {
+    /**
+     * @brief An encryption key used for validating messages over
+     * connectionless transports.
+     */
+    ULONG key;
+
+    /**
+     * @brief A connection identifier (CID).
+     */
+    CID cid;
+
+    /**
+     * @brief A number used to identify the sequence of a message over
+     * connectionless transports.
+     */
+    USHORT sequence_number;
+} smb_security_features_t;
+
+/**
+ * @brief The SMB_Header structure is a fixed 32-bytes in length.
+ */
+typedef struct s_smb_message_header
+{
+    /**
+     * @brief This field MUST contain the 4-byte literal string '\xFF', 'S',
+     * 'M', 'B', with the letters represented by their respective ASCII values
+     * in the order shown. In the earliest available SMB documentation, this
+     * field is defined as a one byte message type (0xFF) followed by a three
+     * byte server type identifier.
+     */
+    UCHAR protocol[4];
+
+    /**
+     * @brief A one-byte command code.
+     */
+    smb_com_t command;
+
+    /**
+     * @brief A 32-bit field used to communicate error messages from the server
+     * to the client.
+     */
+    SMB_ERROR status;
+
+    /**
+     * @brief An 8-bit field of 1-bit flags describing various features in
+     * effect for the message.
+     */
+    smb_flags_t flags;
+
+    /**
+     * @brief A 16-bit field of 1-bit flags that represent various features in
+     * effect for the message. Unspecified bits are reserved and MUST be zero.
+     */
+    smb_flags2_t flags2;
+
+    /**
+     * @brief If set to a nonzero value, this field represents the high-order
+     * bytes of a process identifier (PID). It is combined with the PIDLow
+     * field below to form a full PID.
+     */
+    USHORT pid_high;
+
+    /**
+     * @brief Neither an smb_com_negociate_security_features_t nor an
+     * smb_security_features_t context, so it MUST be set to zero by the client
+     * and MUST be ignored by the server.
+     */
+    UCHAR security_features[8];
+
+    /**
+     * @brief This field is reserved and SHOULD be set to 0x0000.
+     */
+    USHORT reserved;
+
+    /**
+     * @brief A tree identifier (TID).
+     */
+    USHORT tid;
+
+    /**
+     * @brief The lower 16-bits of the PID.
+     */
+    USHORT pid_low;
+
+    /**
+     * @brief A user identifier (UID).
+     */
+    UID uid;
+
+    /**
+     * @brief A multiplex identifier (MID).
+     */
+    MID mid;
+} smb_message_header_t;
 
 #endif /* !__SMB_CIFS_H_ */
