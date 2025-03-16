@@ -2476,4 +2476,33 @@ typedef struct s_smb_message_header
     MID mid;
 } smb_message_header_t;
 
+#define SMB_PARAMETERS_MAX_WORDS ((1 << 8) - 1)
+
+/**
+ * @brief SMB was originally designed as a rudimentary remote procedure call
+ * protocol, and the parameter block was defined as an array of "one word (two
+ * byte) fields containing SMB command dependent parameters". In the CIFS
+ * dialect, however, the SMB_Parameters.Words array can contain any arbitrary
+ * structure. The format of the SMB_Parameters.Words structure is defined
+ * individually for each command message. The size of the Words array is still
+ * measured as a count of byte pairs.
+ * The general format of the parameter block is as follows.
+ */
+typedef struct s_smb_parameters {
+    /**
+     * @brief The size, in two-byte words, of the Words field. This field can
+     * be zero, indicating that the Words field is empty. Note that the size of
+     * this field is one byte and comes after the fixed 32-byte SMB Header,
+     * which causes the Words field to be unaligned.
+     */
+    UCHAR words_count;
+
+    /**
+     * @brief The message-specific parameters structure. The size of this field
+     * MUST be (2 x WordCount) bytes. If WordCount is 0x00, this field is not
+     * included.
+     */
+    USHORT words[SMB_PARAMETERS_MAX_WORDS];
+} smb_parameters_t;
+
 #endif /* !__SMB_CIFS_H_ */
