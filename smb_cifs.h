@@ -1,5 +1,5 @@
 #ifndef __SMB_CIFS_H_
-#define __SMB_CIFS_H_
+    #define __SMB_CIFS_H_
 
 typedef unsigned char UCHAR;
 typedef unsigned long ULONG;
