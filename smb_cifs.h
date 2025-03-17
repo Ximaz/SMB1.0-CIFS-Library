@@ -2218,7 +2218,7 @@ typedef enum __attribute__((packed)) e_smb_flags
      * @brief This flag MUST be set to zero by the client and MUST be ignored
      * by the server.
      */
-    RESERVED = (1 << 2),
+    SMB_FLAGS_RESERVED_1 = (1 << 2),
 
     /**
      * @brief If this bit is set then all pathnames in the SMB SHOULD be
@@ -2436,13 +2436,13 @@ typedef struct __attribute__((packed)) s_smb_message_header
      * @brief An 8-bit field of 1-bit flags describing various features in
      * effect for the message.
      */
-    SMB_FLAGS flags;
+    smb_flags_t flags;
 
     /**
      * @brief A 16-bit field of 1-bit flags that represent various features in
      * effect for the message. Unspecified bits are reserved and MUST be zero.
      */
-    SMB_FLAGS2 flags2;
+    smb_flags2_t flags2;
 
     /**
      * @brief If set to a nonzero value, this field represents the high-order
@@ -2574,13 +2574,21 @@ typedef char *smb_message_t;
 #define SMB_MSG_HEADER(M) ((smb_message_header_t *)(M))
 
 /**
+ * @brief Returns the Parameter address.
+ * @warning Do not cast this as smb_msg_parameter_t, because if the words_count
+ * is 0, the words address is actually the smb_msg_data_t address.
+ * @param M The SMB Message pointer.
+ * @return The Parameter address.
+ */
+#define SMB_MSG_PARAMETER(M) ((M) + sizeof(smb_message_header_t))
+
+/**
  * @brief Returns the Parameter.WordsCount value.
  *
  * @param M The SMB Message pointer.
  * @return The Parameter.WordsCount value.
  */
-#define SMB_MSG_PARAMETER_WORDS_COUNT(M) \
-    *((UCHAR *)((M) + sizeof(smb_message_header_t)))
+#define SMB_MSG_PARAMETER_WORDS_COUNT(M) *(UCHAR *)SMB_MSG_PARAMETER(M)
 
 /**
  * @brief Returns a pointer to the begining of the SMB Message Parameter.Words
@@ -2590,7 +2598,18 @@ typedef char *smb_message_t;
  * @return The begining of the SMB Message Parameter.Words array.
  */
 #define SMB_MSG_PARAMETER_WORDS(M) \
-    (USHORT *)((M) + sizeof(smb_message_header_t) + sizeof(UCHAR))
+    (USHORT *)(SMB_MSG_PARAMETER(M) + sizeof(UCHAR))
+
+/**
+ * @brief Returns the Data address.
+ * @warning Do not cast this as smb_msg_data_t, because if the bytes_count
+ * is 0, the bytes address can be random junk causing crash if accessed.
+ * @param M The SMB Message pointer.
+ * @return The Data address.
+ */
+#define SMB_MSG_DATA(M)                            \
+    (UCHAR *)((void *)SMB_MSG_PARAMETER_WORDS(M) + \
+              sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M))
 
 /**
  * @brief Returns the Data.BytesCount value.
@@ -2598,9 +2617,7 @@ typedef char *smb_message_t;
  * @param M The SMB Message pointer.
  * @return The Data.BytesCount value.
  */
-#define SMB_MSG_DATA_BYTES_COUNT(M)           \
-    *((USHORT *)(SMB_MSG_PARAMETER_WORDS(M) + \
-                 sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M)))
+#define SMB_MSG_DATA_BYTES_COUNT(M) *(USHORT *)SMB_MSG_DATA(M)
 
 /**
  * @brief Returns a pointer to the begining of the SMB Message Data.Bytes
@@ -2609,10 +2626,7 @@ typedef char *smb_message_t;
  * @param M The SMB Message pointer.
  * @return The begining of the SMB Message Data.Bytes array.
  */
-#define SMB_MSG_DATA_BYTES(M)                                     \
-    (UCHAR *)((UCHAR *)SMB_MSG_PARAMETER_WORDS(M) +               \
-              sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M) + \
-              sizeof(USHORT))
+#define SMB_MSG_DATA_BYTES(M) SMB_MSG_DATA(M) + sizeof(USHORT)
 
 /**
  * @brief Returns the total bytes the SMB Message occupies in memory.
@@ -2696,6 +2710,47 @@ typedef struct __attribute__((packed)) s_smb_andx
      */
     USHORT andx_offset;
 } smb_andx_t;
+
+typedef enum __attribute__((packed)) e_smb_access_mode
+{
+    /* Access Mode (Bits [0-2], Mask 0x0007) */
+    ACCESS_MODE_READ = (0x00 << 0),       /* 000b */
+    ACCESS_MODE_WRITE = (0x01 << 0),      /* 001b */
+    ACCESS_MODE_READWRITE = (0x02 << 0),  /* 010b */
+    ACCESS_MODE_EXECUTE = (0x03 << 0),    /* 011b */
+    ACCESS_MODE_RESERVED_4 = (0x04 << 0), /* 100b (Reserved) */
+    ACCESS_MODE_RESERVED_5 = (0x05 << 0), /* 101b (Reserved) */
+    ACCESS_MODE_RESERVED_6 = (0x06 << 0), /* 110b (Reserved) */
+    ACCESS_MODE_RESERVED_7 = (0x07 << 0), /* 111b (Reserved) */
+
+    /* Sharing Mode (Bits [4-6], Mask 0x0070) */
+    SHARING_MODE_COMPAT = (0x00 << 4),     /* 000b */
+    SHARING_MODE_DENY_ALL = (0x01 << 4),   /* 001b */
+    SHARING_MODE_DENY_WRITE = (0x02 << 4), /* 010b */
+    SHARING_MODE_DENY_READ = (0x03 << 4),  /* 011b */
+    SHARING_MODE_DENY_NONE = (0x04 << 4),  /* 100b */
+    SHARING_MODE_RESERVED_5 = (0x05 << 4), /* 101b (Reserved) */
+    SHARING_MODE_RESERVED_6 = (0x06 << 4), /* 110b (Reserved) */
+    SHARING_MODE_RESERVED_7 = (0x07 << 4), /* 111b (Reserved) */
+
+    /* Reference Locality (Bits [8-10], Mask 0x0700) */
+    REF_LOCALITY_UNKNOWN = (0x00 << 8),       /* 000b */
+    REF_LOCALITY_SEQUENTIAL = (0x01 << 8),    /* 001b */
+    REF_LOCALITY_RANDOM_ACCESS = (0x02 << 8), /* 010b */
+    REF_LOCALITY_RANDSEQ = (0x03 << 8),       /* 011b */
+    REF_LOCALITY_RESERVED_4 = (0x04 << 8),    /* 100b (Reserved) */
+    REF_LOCALITY_RESERVED_5 = (0x05 << 8),    /* 101b (Reserved) */
+    REF_LOCALITY_RESERVED_6 = (0x06 << 8),    /* 110b (Reserved) */
+    REF_LOCALITY_RESERVED_7 = (0x07 << 8),    /* 111b (Reserved) */
+
+    /* Cache Mode (Bit 12, Mask 0x1000) */
+    CACHE_MODE_CACHED = (0x00 << 12),    /* 0b */
+    CACHE_MODE_NONCACHED = (0x01 << 12), /* 1b */
+
+    /* Writethrough Mode (Bit 14, Mask 0x4000) */
+    WRITETHROUGH_MODE_WRITEBACK = (0x00 << 14),    /* 0b */
+    WRITETHROUGH_MODE_WRITETHROUGH = (0x01 << 14), /* 1b */
+} smb_access_mode_t;
 
 #pragma pack()
 

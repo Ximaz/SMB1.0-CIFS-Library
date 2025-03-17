@@ -1,9 +1,9 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <stdlib.h>
-#include "smb_com_create_directory.h"
+#include "smb_com_delete_directory.h"
 
-smb_message_t smb_com_create_directory_req(
+smb_message_t smb_com_delete_directory_req(
     UID uid,
     TID tid,
     const char *pathname)
@@ -14,7 +14,7 @@ smb_message_t smb_com_create_directory_req(
 
     if (NULL != msg)
     {
-        header->command = SMB_COM_CREATE_DIRECTORY;
+        header->command = SMB_COM_DELETE_DIRECTORY;
         header->tid = tid;
         header->uid = uid;
         *(SMB_MSG_DATA_BYTES(msg) + 0) = SMB_STRING;
@@ -25,7 +25,7 @@ smb_message_t smb_com_create_directory_req(
     return msg;
 }
 
-smb_message_t smb_com_create_directory_resp(
+smb_message_t smb_com_delete_directory_resp(
     smb_error_class_t error_class,
     smb_error_code_t error_code)
 {
@@ -34,7 +34,7 @@ smb_message_t smb_com_create_directory_resp(
 
     if (NULL != msg)
     {
-        header->command = SMB_COM_CREATE_DIRECTORY;
+        header->command = SMB_COM_DELETE_DIRECTORY;
         header->status.error_class = error_class;
         header->status._reserved = 0;
         header->status.error_code = error_code;

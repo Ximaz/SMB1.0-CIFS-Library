@@ -22,6 +22,8 @@
  * on the server.
  * @param tid A valid TID MUST be provided. The TID represents the root of the
  * directory tree in which the new directory is created.
+ * @param pathname The path to A null-terminated string giving the full
+ * pathname, relative to the supplied TID, of the directory to be created.
  * @return The allocated message on success, NULL otherwise.
  * @note Deprecated.
  */

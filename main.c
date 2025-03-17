@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "commands/smb_com_create_directory.h"
+#include "smb_cifs_commands.h"
 #include "debug_memory/debug_memory.h"
 
 static inline void debug_smb_message_attr(const char *name, const void *attr,
@@ -26,11 +26,11 @@ static void debug_smb_message(const smb_message_t msg)
     debug_smb_message_attr("Status", (const void *)&(header->status), sizeof(SMB_ERROR), 0);
     debug_smb_message_attr("Flags", (const void *)&(header->flags), sizeof(SMB_FLAGS), 0);
     debug_smb_message_attr("Flags2", (const void *)&(header->flags2), sizeof(SMB_FLAGS2), 0);
-    debug_smb_message_attr("PID", (const void *)&(header->pid_high), sizeof(USHORT), 0);
+    debug_smb_message_attr("PID High", (const void *)&(header->pid_high), sizeof(USHORT), 0);
     debug_smb_message_attr("Security", (const void *)&(header->security_features), sizeof(UCHAR[8]), 0);
     debug_smb_message_attr("Reserved", (const void *)&(header->reserved), sizeof(USHORT), 0);
     debug_smb_message_attr("TID", (const void *)&(header->tid), sizeof(TID), 0);
-    debug_smb_message_attr("PID", (const void *)&(header->pid_low), sizeof(USHORT), 0);
+    debug_smb_message_attr("PID Low", (const void *)&(header->pid_low), sizeof(USHORT), 0);
     debug_smb_message_attr("UID", (const void *)&(header->uid), sizeof(UID), 0);
     debug_smb_message_attr("MID", (const void *)&(header->mid), sizeof(MID), 0);
     printf("--- END SMB MESSAGE HEADER ---\n");
@@ -50,20 +50,9 @@ static void debug_smb_message(const smb_message_t msg)
 
 int main(void)
 {
-    smb_message_t req = smb_com_create_directory_req(1, 2, "MY PATH");
-    smb_message_t resp = smb_com_create_directory_resp(ERRCLS_DOS,
-                                                       ERRDOS_NOACCESS);
+    smb_message_t open = smb_com_open_req(1, 2, "MY PATH", 0, ACCESS_MODE_READWRITE | SHARING_MODE_DENY_ALL, ATTR_NORMAL);
 
-    debug_smb_message(req);
-    smb_message_dtor(req);
-    printf("sizeof(smb_error_code_t) (= %zu) + sizeof(UCHAR) (= %zu) + sizeof(smb_error_class_t) (= %zu) = %zu\n",
-           sizeof(smb_error_code_t),
-           sizeof(UCHAR),
-           sizeof(smb_error_class_t),
-           sizeof(smb_error_code_t) +
-               sizeof(UCHAR) +
-               sizeof(smb_error_class_t));
-    debug_smb_message(resp);
-    smb_message_dtor(resp);
+    debug_smb_message(open);
+    smb_message_dtor(open);
     return 0;
 }
