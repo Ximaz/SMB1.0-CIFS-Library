@@ -1004,7 +1004,7 @@ typedef struct e_smb_error
     /**
      * @brief An SMB error class code.
      */
-    smb_error_class_t error_class;
+    UCHAR error_class;
 
     /**
      * @brief This field is reserved and MUST be ignored by both server and
@@ -1015,7 +1015,7 @@ typedef struct e_smb_error
     /**
      * @brief An SMB error code.
      */
-    smb_error_code_t error_code;
+    USHORT error_code;
 } smb_error_t;
 
 /**
@@ -2571,7 +2571,7 @@ typedef char *smb_message_t;
  * @param M The SMB Message pointer.
  * @return The begining of the SMB Message Header section.
  */
-#define SMB_MSG_HEADER(M) (smb_message_header_t *)(M)
+#define SMB_MSG_HEADER(M) ((smb_message_header_t *)(M))
 
 /**
  * @brief Returns the Parameter.WordsCount value.
@@ -2640,6 +2640,14 @@ typedef char *smb_message_t;
 smb_message_t smb_message_ctor(
     UCHAR parameter_words_count,
     USHORT data_bytes_count);
+
+/**
+ * @brief This function decodes raw bytes into an actual SMB Message.
+ *
+ * @param raw_bytes The raw bytes to decode.
+ * @return The allocated message on success, NULL otherwise.
+ */
+smb_message_t smb_message_decode(const void *raw_bytes);
 
 /**
  * @brief Deallocates an SMB Message, and it's Parameter words / Data bytes if

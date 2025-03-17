@@ -42,6 +42,17 @@ smb_message_t smb_message_ctor(
     return msg;
 }
 
+smb_message_t smb_message_decode(const void *raw_bytes)
+{
+    smb_message_t msg = smb_message_ctor(
+        SMB_MSG_PARAMETER_WORDS_COUNT(raw_bytes),
+        SMB_MSG_DATA_BYTES_COUNT(raw_bytes));
+
+    if (NULL != msg)
+        memcpy(msg, (const char *) raw_bytes, SMB_MSG_SIZE(raw_bytes));
+    return msg;
+}
+
 void smb_message_dtor(smb_message_t msg)
 {
     free(msg);

@@ -25,22 +25,20 @@
  * @return The allocated message on success, NULL otherwise.
  * @note Deprecated.
  */
-smb_message_t smb_com_create_directory_req_encode(
+smb_message_t smb_com_create_directory_req(
     UID uid,
     TID tid,
-    const char *pathname
-);
+    const char *pathname);
 
 /**
- * @brief This function decodes the response from the SMB Server for the
- * SMB_COM_CREATE_DIRECTORY command.
+ * @brief This function creates an SMB Message representing the response from
+ * the server to the SMB_COM_CREATE_DIRECTORY command.
  *
  * @param resp The raw bytes sent by the server as a response.
- * @return The decoded SMB Message on success, NULL otherwise.
+ * @return The allocated message on success, NULL otherwise.
  */
-smb_message_t smb_com_create_directory_resp_decode(
-    const void *resp
-);
-
+smb_message_t smb_com_create_directory_resp(
+    smb_error_class_t error_class,
+    smb_error_code_t error_code);
 
 #endif /* !__SMB_COM_CREATE_DIRECTORY_H_ */

@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "commands/smb_com_create_directory.h"
 #include "debug_memory/debug_memory.h"
 
 static inline void debug_smb_message_attr(const char *name, const void *attr,
-size_t size, int is_array)
+                                          size_t size, int is_array)
 {
     printf("%s : ", name);
     if (is_array)
@@ -49,9 +50,13 @@ static void debug_smb_message(const smb_message_t msg)
 
 int main(void)
 {
-    smb_message_t msg = smb_com_create_directory_req_encode(1, 2, "MY PATH");
+    smb_message_t req = smb_com_create_directory_req(1, 2, "MY PATH");
+    smb_message_t resp = smb_com_create_directory_resp(ERRCLS_DOS,
+                                                       ERRDOS_NOACCESS);
 
-    debug_smb_message(msg);
-    smb_message_dtor(msg);
+    debug_smb_message(req);
+    smb_message_dtor(req);
+    debug_smb_message(resp);
+    smb_message_dtor(resp);
     return 0;
 }
