@@ -3,11 +3,6 @@
 
 #include "../smb_cifs.h"
 
-typedef struct s_smb_com_create_directory_response
-{
-
-} smb_com_create_directory_response_t;
-
 /**
  * @brief This is an original Core Protocol command. This command is
  * deprecated. Clients SHOULD use the TRANS2_CREATE_DIRECTORY subcommand.
@@ -30,10 +25,22 @@ typedef struct s_smb_com_create_directory_response
  * @return The allocated message on success, NULL otherwise.
  * @note Deprecated.
  */
-smb_message_t smb_com_create_directory(
+smb_message_t smb_com_create_directory_req_encode(
     UID uid,
     TID tid,
     const char *pathname
 );
+
+/**
+ * @brief This function decodes the response from the SMB Server for the
+ * SMB_COM_CREATE_DIRECTORY command.
+ *
+ * @param resp The raw bytes sent by the server as a response.
+ * @return The decoded SMB Message on success, NULL otherwise.
+ */
+smb_message_t smb_com_create_directory_resp_decode(
+    const void *resp
+);
+
 
 #endif /* !__SMB_COM_CREATE_DIRECTORY_H_ */

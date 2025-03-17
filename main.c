@@ -49,7 +49,7 @@ static void debug_smb_message(const smb_message_t msg)
 
 int main(void)
 {
-    smb_message_t msg = smb_com_create_directory(1, 2, "MY PATH");
+    smb_message_t msg = smb_com_create_directory_req_encode(1, 2, "MY PATH");
 
     debug_smb_message(msg);
     smb_message_dtor(msg);

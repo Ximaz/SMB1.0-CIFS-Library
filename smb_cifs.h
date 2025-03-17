@@ -2565,11 +2565,66 @@ typedef struct s_smb_data
  */
 typedef char *smb_message_t;
 
-#define SMB_MSG_PARAMETER_WORDS_COUNT(M) *((UCHAR *)((M) + sizeof(smb_message_header_t)))
-#define SMB_MSG_PARAMETER_WORDS(M) (USHORT *)((M) + sizeof(smb_message_header_t) + sizeof(UCHAR))
-#define SMB_MSG_DATA_BYTES_COUNT(M) *((USHORT *)(SMB_MSG_PARAMETER_WORDS(M) + sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M)))
-#define SMB_MSG_DATA_BYTES(M) (UCHAR *)((UCHAR *)SMB_MSG_PARAMETER_WORDS(M) + sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M) + sizeof(USHORT))
-#define SMB_MSG_SIZE(M) (sizeof(smb_message_header_t) + sizeof(UCHAR) + (sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M)) + sizeof(USHORT) + (sizeof(UCHAR) * SMB_MSG_DATA_BYTES_COUNT(M)))
+/**
+ * @brief Returns a pointer to the begining of the SMB Message Header.
+ *
+ * @param M The SMB Message pointer.
+ * @return The begining of the SMB Message Header section.
+ */
+#define SMB_MSG_HEADER(M) (smb_message_header_t *)(M)
+
+/**
+ * @brief Returns the Parameter.WordsCount value.
+ *
+ * @param M The SMB Message pointer.
+ * @return The Parameter.WordsCount value.
+ */
+#define SMB_MSG_PARAMETER_WORDS_COUNT(M) \
+    *((UCHAR *)((M) + sizeof(smb_message_header_t)))
+
+/**
+ * @brief Returns a pointer to the begining of the SMB Message Parameter.Words
+ * array.
+ *
+ * @param M The SMB Message pointer.
+ * @return The begining of the SMB Message Parameter.Words array.
+ */
+#define SMB_MSG_PARAMETER_WORDS(M) \
+    (USHORT *)((M) + sizeof(smb_message_header_t) + sizeof(UCHAR))
+
+/**
+ * @brief Returns the Data.BytesCount value.
+ *
+ * @param M The SMB Message pointer.
+ * @return The Data.BytesCount value.
+ */
+#define SMB_MSG_DATA_BYTES_COUNT(M)           \
+    *((USHORT *)(SMB_MSG_PARAMETER_WORDS(M) + \
+                 sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M)))
+
+/**
+ * @brief Returns a pointer to the begining of the SMB Message Data.Bytes
+ * array.
+ *
+ * @param M The SMB Message pointer.
+ * @return The begining of the SMB Message Data.Bytes array.
+ */
+#define SMB_MSG_DATA_BYTES(M)                                     \
+    (UCHAR *)((UCHAR *)SMB_MSG_PARAMETER_WORDS(M) +               \
+              sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M) + \
+              sizeof(USHORT))
+
+/**
+ * @brief Returns the total bytes the SMB Message occupies in memory.
+ *
+ * @param M The SMB Message pointer.
+ * @return The total bytes the SMB Message occupies in memory.
+ */
+#define SMB_MSG_SIZE(M)                                                    \
+    (sizeof(smb_message_header_t) +                                        \
+     sizeof(UCHAR) + (sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M)) + \
+     sizeof(USHORT) + (sizeof(UCHAR) * SMB_MSG_DATA_BYTES_COUNT(M)))
+
 /**
  * @brief Allocates a read-to-use SMB Message object.
  *
