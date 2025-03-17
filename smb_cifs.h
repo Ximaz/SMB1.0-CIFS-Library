@@ -2532,7 +2532,7 @@ typedef struct s_smb_data
      * is two bytes in size, the first byte of SMB_Data.Bytes is also
      * unaligned.
      */
-    USHORT byte_count;
+    USHORT bytes_count;
 
     /**
      * @brief The message-specific data structure. The size of this field MUST
@@ -2563,12 +2563,36 @@ typedef struct s_smb_data
  * protocol has evolved over time, this differentiation has been generally
  * maintained.
  */
-typedef struct s_smb_message
-{
-    smb_message_header_t header;
-    smb_message_parameters_t parameter_block;
-    smb_message_data_t data_block;
-} smb_message_t;
+typedef char *smb_message_t;
+
+#define SMB_MSG_PARAMETER_WORDS_COUNT(M) *((UCHAR *)((M) + sizeof(smb_message_header_t)))
+#define SMB_MSG_PARAMETER_WORDS(M) (USHORT *)((M) + sizeof(smb_message_header_t) + sizeof(UCHAR))
+#define SMB_MSG_DATA_BYTES_COUNT(M) *((USHORT *)(SMB_MSG_PARAMETER_WORDS(M) + sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M)))
+#define SMB_MSG_DATA_BYTES(M) (UCHAR *)((UCHAR *)SMB_MSG_PARAMETER_WORDS(M) + sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M) + sizeof(USHORT))
+#define SMB_MSG_SIZE(M) (sizeof(smb_message_header_t) + sizeof(UCHAR) + (sizeof(USHORT) * SMB_MSG_PARAMETER_WORDS_COUNT(M)) + sizeof(USHORT) + (sizeof(UCHAR) * SMB_MSG_DATA_BYTES_COUNT(M)))
+/**
+ * @brief Allocates a read-to-use SMB Message object.
+ *
+ * @param parameter_words_count The number of words to be stored in the
+ * smb_message_parameter_t.words array. If this value is non-zero, the words
+ * array will be allocated. If not, it remains a NULL pointer. The words count
+ * member will be set accordingly.
+ * @param data_bytes_count The number of bytes to be stored in the
+ * smb_message_data_t.bytes array. If this value is non-zero, the bytes array
+ * will be allocated. If not, it remains a NULL pointer. The bytes count
+ * member will be set accordingly.
+ */
+smb_message_t smb_message_ctor(
+    UCHAR parameter_words_count,
+    USHORT data_bytes_count);
+
+/**
+ * @brief Deallocates an SMB Message, and it's Parameter words / Data bytes if
+ * they were allocated.
+ *
+ * @param msg The SMB Message to deallocate.
+ */
+void smb_message_dtor(smb_message_t msg);
 
 /**
  * @brief Batched messages using the AndX construct were introduced in the LAN
