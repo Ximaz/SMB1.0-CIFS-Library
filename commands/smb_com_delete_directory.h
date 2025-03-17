@@ -26,7 +26,8 @@ smb_message_t smb_com_delete_directory_req(
  * @brief This function creates an SMB Message representing the response from
  * the server to the SMB_COM_DELETE_DIRECTORY command.
  *
- * @param resp The raw bytes sent by the server as a response.
+ * @param error_class The kind of error to return.
+ * @param error_code The error code belonging to the error class.
  * @return The allocated message on success, NULL otherwise.
  */
 smb_message_t smb_com_delete_directory_resp(

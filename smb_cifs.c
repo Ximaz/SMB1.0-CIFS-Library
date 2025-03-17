@@ -27,7 +27,6 @@ smb_message_t smb_message_ctor(
                          sizeof(USHORT) + data_bytes_count * sizeof(UCHAR);
     smb_message_t msg = (smb_message_t)malloc(object_size);
 
-    printf("Object size : %zu\nParams : %d\nBytes : %d\n", object_size, parameter_words_count, data_bytes_count);
     if (NULL != msg)
     {
         bind_smb_message_parameter(msg, parameter_words_count);

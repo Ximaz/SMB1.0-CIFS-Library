@@ -16,7 +16,8 @@ smb_message_t smb_com_open_req(
     smb_message_t msg = smb_message_ctor(2, 1 + pathname_len + 1);
     smb_message_header_t *header = (smb_message_header_t *)msg;
 
-    if (NULL != msg) {
+    if (NULL != msg)
+    {
         header->command = SMB_COM_OPEN;
         header->flags = flags;
         header->tid = tid;
@@ -32,14 +33,16 @@ smb_message_t smb_com_open_req(
 }
 smb_message_t smb_com_open_resp(
     smb_error_class_t error_class,
-    smb_error_code_t error_code)
+    smb_error_code_t error_code,
+    const smb_com_open_file_t *file_handle)
 {
-    smb_message_t msg = smb_message_ctor(0, 0);
+    smb_message_t msg = smb_message_ctor(0x07, 0);
     smb_message_header_t *header = SMB_MSG_HEADER(msg);
 
     if (NULL != msg)
     {
         header->command = SMB_COM_OPEN;
+        memcpy(SMB_MSG_PARAMETER_WORDS(msg), file_handle, sizeof(smb_com_open_file_t));
         header->status.error_class = error_class;
         header->status._reserved = 0;
         header->status.error_code = error_code;
