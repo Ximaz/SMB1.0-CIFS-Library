@@ -36,8 +36,9 @@ smb_message_t smb_message_ctor(
     {
         bind_smb_message_parameter(msg, parameter_words_count);
         bind_smb_message_data(msg, data_bytes_count, parameter_words_count);
-        memset(msg, 0, sizeof(smb_message_header_t));
-        strncpy(msg, PROTOCOL, 4);
+        strncpy(msg, PROTOCOL, sizeof(PROTOCOL));
+        memset(msg + sizeof(PROTOCOL), 0,
+            sizeof(smb_message_header_t) - sizeof(PROTOCOL));
     }
     return msg;
 }
@@ -49,7 +50,7 @@ smb_message_t smb_message_decode(const void *raw_bytes)
         SMB_MSG_DATA_BYTES_COUNT(raw_bytes));
 
     if (NULL != msg)
-        memcpy(msg, (const char *) raw_bytes, SMB_MSG_SIZE(raw_bytes));
+        memcpy(msg, (const char *)raw_bytes, SMB_MSG_SIZE(raw_bytes));
     return msg;
 }
 
