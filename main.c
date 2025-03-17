@@ -56,6 +56,13 @@ int main(void)
 
     debug_smb_message(req);
     smb_message_dtor(req);
+    printf("sizeof(smb_error_code_t) (= %zu) + sizeof(UCHAR) (= %zu) + sizeof(smb_error_class_t) (= %zu) = %zu\n",
+           sizeof(smb_error_code_t),
+           sizeof(UCHAR),
+           sizeof(smb_error_class_t),
+           sizeof(smb_error_code_t) +
+               sizeof(UCHAR) +
+               sizeof(smb_error_class_t));
     debug_smb_message(resp);
     smb_message_dtor(resp);
     return 0;

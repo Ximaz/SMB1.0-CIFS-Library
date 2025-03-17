@@ -21,7 +21,7 @@ typedef int32_t SMB_ERROR;
  * name. This structure is used when the SMB_INFO_QUERY_EAS_FROM_LIST
  * information level is specified. "GEA" stands for "get extended attribute".
  */
-typedef struct s_smb_gea
+typedef struct __attribute__((packed)) s_smb_gea
 {
     /**
      * @brief This field MUST contain the length, in bytes (excluding the
@@ -53,7 +53,7 @@ typedef struct s_smb_gea
  * @brief The SMB_GEA_LIST data structure is used to send a concatenated list
  * of SMB_GEA structures.
  */
-typedef struct s_smb_gea_list
+typedef struct __attribute__((packed)) s_smb_gea_list
 {
     /**
      * @brief This field MUST contain the total size of the GEAList field, plus
@@ -74,7 +74,7 @@ typedef struct s_smb_gea_list
  * the NT_TRANSACT_CREATE subcommand to encode an extended attribute (EA)
  * name/value pair. "FEA" stands for "full extended attribute".
  */
-typedef struct s_smb_fea
+typedef struct __attribute__((packed)) s_smb_fea
 {
     /**
      * @brief This is a bit field. Only the 0x80 bit is defined.
@@ -150,7 +150,7 @@ typedef struct s_smb_fea
  * @brief The SMB_FEA_LIST data structure is used to send a concatenated list
  * of SMB_FEA structures.
  */
-typedef struct s_smb_fea_list
+typedef struct __attribute__((packed)) s_smb_fea_list
 {
     /**
      * @brief This field MUST contain the total size of the FEAList field, plus
@@ -172,7 +172,7 @@ typedef struct s_smb_fea_list
  * Including any other attribute value causes the ATTR_NORMAL value to be
  * ignored. Any combination of the flag values (see following) is acceptable.
  */
-typedef enum e_smb_ext_file_attr
+typedef enum __attribute__((packed)) e_smb_ext_file_attr
 {
     /**
      * @brief The file is read only. Applications can read the file but cannot
@@ -284,7 +284,7 @@ typedef DWORD SMB_EXT_FILE_ATTR;
  * (those Names prefixed with SMB_SEARCH_ATTRIBUTE) are defined for use when
  * searching for files within a directory.
  */
-typedef enum e_smb_file_attributes
+typedef enum __attribute__((packed)) e_smb_file_attributes
 {
     /**
      * @brief Normal file.
@@ -359,7 +359,7 @@ typedef enum e_smb_file_attributes
  * integers. Subfields marked Reserved SHOULD be set to zero by the server and
  * MUST be ignored by the client.
  */
-typedef enum e_smb_nmpipe_status
+typedef enum __attribute__((packed)) e_smb_nmpipe_status
 {
     /**
      * @brief An 8-bit unsigned integer that gives the maximum number of
@@ -434,7 +434,7 @@ typedef USHORT SMB_NMPIPE_STATUS;
  * represented in the local time zone of the server. The following field names
  * are provided for reference only.
  */
-typedef enum e_smb_date
+typedef enum __attribute__((packed)) e_smb_date
 {
     /**
      * @brief The year. Add 1980 to the resulting value to return the actual
@@ -460,7 +460,7 @@ typedef enum e_smb_date
  * value SHOULD be interpreted as follows. The field names below are provided
  * for reference only. The time is represented in the local time zone of the server.
  */
-typedef enum e_smb_time
+typedef enum __attribute__((packed)) e_smb_time
 {
     /**
      * @brief The hours. Values range from 0 to 23.
@@ -484,7 +484,7 @@ typedef enum e_smb_time
  */
 typedef uint32_t UTIME;
 
-typedef enum e_smb_error_class
+typedef enum __attribute__((packed)) e_smb_error_class
 {
     ERRCLS_SUCCESS = 0x00,
     ERRCLS_DOS = 0x01,
@@ -493,7 +493,7 @@ typedef enum e_smb_error_class
     ERRCLS_CMD = 0xFF,
 } smb_error_class_t;
 
-typedef enum e_smb_error_code
+typedef enum __attribute__((packed)) e_smb_error_code
 {
     /**
      * @brief Everything worked, no problems.
@@ -999,12 +999,12 @@ typedef enum e_smb_error_code
  * message, as defined in [MS-ERREF] section 2.3), or as an SMBSTATUS value (as
  * defined following).
  */
-typedef struct e_smb_error
+typedef struct __attribute__((packed)) s_smb_error
 {
     /**
      * @brief An SMB error class code.
      */
-    UCHAR error_class;
+    smb_error_class_t error_class;
 
     /**
      * @brief This field is reserved and MUST be ignored by both server and
@@ -1015,7 +1015,7 @@ typedef struct e_smb_error
     /**
      * @brief An SMB error code.
      */
-    USHORT error_code;
+    smb_error_code_t error_code;
 } smb_error_t;
 
 /**
@@ -1227,7 +1227,7 @@ typedef UID VUID;
  * @brief Following is a listing of all SMB commands used in CIFS and their
  * associated command codes.
  */
-typedef enum e_smb_com
+typedef enum __attribute__((packed)) e_smb_com
 {
     /**
      * @brief Create a new directory.
@@ -1709,7 +1709,7 @@ typedef UCHAR SMB_COM;
 /**
  * @brief Transaction Codes used with SMB_COM_TRANSACTION.
  */
-typedef enum e_smb_trans
+typedef enum __attribute__((packed)) e_smb_trans
 {
     /**
      * @brief Allows a client to write data to a specific mailslot on the
@@ -1791,7 +1791,7 @@ typedef enum e_smb_trans
 /**
  * @brief Transaction Codes used with SMB_COM_TRANSACTION2.
  */
-typedef enum e_smb_trans2
+typedef enum __attribute__((packed)) e_smb_trans2
 {
     /**
      * @brief Open or create a file and set extended attributes on the file.
@@ -1901,7 +1901,7 @@ typedef enum e_smb_trans2
 /**
  * @brief Transaction codes used with SMB_COM_NT_TRANSACT.
  */
-typedef enum e_smb_nt_trans
+typedef enum __attribute__((packed)) e_smb_nt_trans
 {
     /**
      * @brief Used to create or open a file or directory when extended
@@ -1945,7 +1945,7 @@ typedef enum e_smb_nt_trans
  * that a server MUST respond with for each file matching the request's search
  * criteria.
  */
-typedef enum e_smb_trans2_find
+typedef enum __attribute__((packed)) e_smb_trans2_find
 {
     /**
      * @brief Return creation, access, and last write timestamps, size and file
@@ -1996,7 +1996,7 @@ typedef enum e_smb_trans2_find
  * subcommand requests to indicate the level of information that a server MUST
  * respond with for the underlying object store indicated in the request.
  */
-typedef enum e_smb_trans2_query_fs
+typedef enum __attribute__((packed)) e_smb_trans2_query_fs
 {
     /**
      * @brief Query file system allocation unit information.
@@ -2036,7 +2036,7 @@ typedef enum e_smb_trans2_query_fs
  * of information that a server MUST respond with for the file or directory
  * indicated in the request.
  */
-typedef enum e_smb_trans2_query
+typedef enum __attribute__((packed)) e_smb_trans2_query
 {
     /**
      * @brief Query creation, access, and last write timestamps, size and file
@@ -2117,7 +2117,7 @@ typedef enum e_smb_trans2_query
  * TRANS2_SET_FILE_INFORMATION subcommand requests to indicate what level of
  * information is being set on the file or directory in the request.
  */
-typedef enum e_smb_trans2_set
+typedef enum __attribute__((packed)) e_smb_trans2_set
 {
     /**
      * @brief Set creation, access, and last write timestamps.
@@ -2151,7 +2151,7 @@ typedef enum e_smb_trans2_set
     SMB_SET_FILE_END_OF_FILE_INFO = 0x0104,
 } smb_trans2_set_t;
 
-typedef enum e_smb_data_buffer_format_code
+typedef enum __attribute__((packed)) e_smb_data_buffer_format_code
 {
     /**
      * @brief A two-byte USHORT value indicating the length of the data buffer.
@@ -2193,7 +2193,7 @@ typedef enum e_smb_data_buffer_format_code
 /**
  * @
  */
-typedef enum e_smb_flags
+typedef enum __attribute__((packed)) e_smb_flags
 {
     /**
      * @brief This bit is set (1) in the SMB_COM_NEGOTIATE (0x72) Response if
@@ -2280,7 +2280,7 @@ typedef enum e_smb_flags
 
 typedef UCHAR SMB_FLAGS;
 
-typedef enum e_smb_flags2
+typedef enum __attribute__((packed)) e_smb_flags2
 {
     /**
      * @brief If the bit is set, the message MAY contain long file names.
@@ -2372,7 +2372,7 @@ typedef USHORT SMB_FLAGS2;
 /**
  * @brief In the case that security signatures are negotiated :
  */
-typedef struct s_smb_com_negociate_security_features
+typedef struct __attribute__((packed)) s_smb_com_negociate_security_features
 {
     /**
      * @brief If SMB signing has been negotiated, this field MUST contain an
@@ -2387,7 +2387,7 @@ typedef struct s_smb_com_negociate_security_features
  * @brief In the case that CIFS is being transported over a connectionless
  * transport :
  */
-typedef struct s_smb_security_features
+typedef struct __attribute__((packed)) s_smb_security_features
 {
     /**
      * @brief An encryption key used for validating messages over
@@ -2410,7 +2410,7 @@ typedef struct s_smb_security_features
 /**
  * @brief The SMB_Header structure is a fixed 32-bytes in length.
  */
-typedef struct s_smb_message_header
+typedef struct __attribute__((packed)) s_smb_message_header
 {
     /**
      * @brief This field MUST contain the 4-byte literal string '\xFF', 'S',
@@ -2424,13 +2424,13 @@ typedef struct s_smb_message_header
     /**
      * @brief A one-byte command code.
      */
-    SMB_COM command;
+    smb_com_t command;
 
     /**
      * @brief A 32-bit field used to communicate error messages from the server
      * to the client.
      */
-    SMB_ERROR status;
+    smb_error_t status;
 
     /**
      * @brief An 8-bit field of 1-bit flags describing various features in
@@ -2496,7 +2496,7 @@ typedef struct s_smb_message_header
  * measured as a count of byte pairs.
  * The general format of the parameter block is as follows.
  */
-typedef struct s_smb_parameters
+typedef struct __attribute__((packed)) s_smb_parameters
 {
     /**
      * @brief The size, in two-byte words, of the Words field. This field can
@@ -2523,7 +2523,7 @@ typedef struct s_smb_parameters
  * Parameter block, except that the length of the buffer portion is measured in
  * bytes.
  */
-typedef struct s_smb_data
+typedef struct __attribute__((packed)) s_smb_data
 {
     /**
      * @brief The size, in bytes, of the Bytes field. This field can be 0x0000,
@@ -2675,18 +2675,18 @@ void smb_message_dtor(smb_message_t msg);
  * list is referred to as an AndX Chain. The structure of this construct is
  * shown below.
  */
-typedef struct s_smb_andx
+typedef struct __attribute__((packed)) s_smb_andx
 {
     /**
      * @brief The command code associated with the next block pair in the AndX
      * Chain.
      */
-    UCHAR andx_command;
+    smb_com_t andx_command;
 
     /**
      * @brief This field is reserved and MUST be 0x00.
      */
-    UCHAR andx_reserved;
+    UCHAR _andx_reserved;
 
     /**
      * @brief The offset in bytes, relative to the start of the SMB Header, of

@@ -35,7 +35,9 @@ smb_message_t smb_com_create_directory_resp(
     if (NULL != msg)
     {
         header->command = SMB_COM_CREATE_DIRECTORY;
-        header->status = ((error_code & 0xFF00) << 24) | ((error_code & 0x00FF) << 16) | (0 << 8) | error_class;
+        header->status.error_class = error_class;
+        header->status._reserved = 0;
+        header->status.error_code = error_code;
     }
     return msg;
 }
