@@ -29,6 +29,7 @@ smb_message_t smb_com_create_req(
     }
     return msg;
 }
+
 smb_message_t smb_com_create_resp(
     smb_error_class_t error_class,
     smb_error_code_t error_code,

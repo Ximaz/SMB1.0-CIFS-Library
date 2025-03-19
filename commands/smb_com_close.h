@@ -3,15 +3,6 @@
 
 #include "../smb_cifs.h"
 
-#pragma pack(1)
-
-typedef struct __attribute__((packed)) s_smb_com_create_file
-{
-
-} smb_com_create_file_t;
-
-#pragma pack()
-
 /**
  * @brief This is an original Core Protocol command.
  *
@@ -26,7 +17,6 @@ typedef struct __attribute__((packed)) s_smb_com_create_file
  * 0x00000000 or 0xFFFFFFFF results in the server not updating the last
  * modification time.
  * @return The allocated message on success, NULL otherwise.
- * @note Deprecated.
  */
 smb_message_t smb_com_close_req(
     UID uid,
