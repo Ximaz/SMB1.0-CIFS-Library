@@ -5,5 +5,6 @@
 #include "commands/smb_com_create_directory.h"
 #include "commands/smb_com_delete_directory.h"
 #include "commands/smb_com_open.h"
+#include "commands/smb_com_create.h"
 
 #endif /** !__SMB_CIFS_COMMANDS_H_ */
