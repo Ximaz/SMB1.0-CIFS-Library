@@ -39,7 +39,7 @@ smb_message_t smb_com_create_resp(
 
     if (NULL != msg)
     {
-        header->command = SMB_COM_OPEN;
+        header->command = SMB_COM_CREATE;
         memcpy(SMB_MSG_PARAMETER_WORDS(msg), file_handle, sizeof(smb_com_create_file_t));
         header->status.error_class = error_class;
         header->status._reserved = 0;
