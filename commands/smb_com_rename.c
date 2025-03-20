@@ -45,7 +45,7 @@ smb_message_t smb_com_rename_resp(
     smb_error_class_t error_class,
     smb_error_code_t error_code)
 {
-    smb_message_t msg = smb_message_ctor(0x01, 0);
+    smb_message_t msg = smb_message_ctor(0, 0);
     smb_message_header_t *header = SMB_MSG_HEADER(msg);
 
     if (NULL != msg)

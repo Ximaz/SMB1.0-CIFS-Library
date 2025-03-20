@@ -20,7 +20,12 @@
  * be given to the file(s) that matches OldFileName or the name of the
  * destination directory into which the files matching OldFileName MUST be
  * moved.
- * @param search_attributes A 16-bit field of 1-bit flags that represent the file
+ * @param search_attributes Indicates the file attributes that the file(s) to
+ * be renamed MUST have. If the value of this field is 0x0000, then only normal
+ * files MUST be matched to be renamed. If the System or Hidden attributes are
+ * specified, then entries with those attributes MAY be matched in addition to
+ * the normal files. Read-only files MUST NOT be renamed. The read-only
+ * attribute of the file MUST be cleared before it can be renamed.
  * @param match_long_filenames Wildcard pattern matching behavior. If this flag
  * is not set, wildcard patterns MUST compare against 8.3 names only. If a file
  * has a long name, the wildcard pattern MUST be compared to that file's 8.3
