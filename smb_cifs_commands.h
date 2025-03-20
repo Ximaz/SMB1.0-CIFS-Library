@@ -10,5 +10,6 @@
 #include "commands/smb_com_flush.h"
 #include "commands/smb_com_delete.h"
 #include "commands/smb_com_rename.h"
+#include "commands/smb_com_query_information.h"
 
 #endif /** !__SMB_CIFS_COMMANDS_H_ */
