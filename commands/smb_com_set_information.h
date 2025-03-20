@@ -36,7 +36,7 @@ smb_message_t smb_com_set_information_req(
 
 /**
  * @brief This function creates an SMB Message representing the response from
- * the server to the SMB_COM_RENAME command.
+ * the server to the SMB_COM_SET_INFORMATION command.
  *
  * @param error_class The kind of error to return.
  * @param error_code The error code belonging to the error class.
