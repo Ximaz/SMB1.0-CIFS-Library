@@ -28,7 +28,6 @@
  * patterns MUST compare against the long file name of a file if it is
  * available. (Either 1 or 0)
  * @return The allocated message on success, NULL otherwise.
- * @note Deprecated.
  */
 smb_message_t smb_com_delete_req(
     UID uid,
