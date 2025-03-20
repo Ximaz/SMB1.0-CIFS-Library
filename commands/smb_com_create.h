@@ -58,6 +58,7 @@ smb_message_t smb_com_create_req(
  *
  * @param error_class The kind of error to return.
  * @param error_code The error code belonging to the error class.
+ * @param file_handle All the informations about the created file.
  * @return The allocated message on success, NULL otherwise.
  */
 smb_message_t smb_com_create_resp(
