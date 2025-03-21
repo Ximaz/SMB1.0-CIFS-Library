@@ -12,5 +12,6 @@
 #include "commands/smb_com_rename.h"
 #include "commands/smb_com_query_information.h"
 #include "commands/smb_com_set_information.h"
+#include "commands/smb_com_read.h"
 
-#endif /** !__SMB_CIFS_COMMANDS_H_ */
+#endif /* !__SMB_CIFS_COMMANDS_H_ */

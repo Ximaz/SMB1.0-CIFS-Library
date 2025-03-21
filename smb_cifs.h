@@ -2344,6 +2344,7 @@ typedef enum __attribute__((packed)) e_smb_flags2
      * also known as SMB_FLAGS2_READ_IF_EXECUTE.
      */
     SMB_FLAGS2_PAGING_IO = (1 << 13),
+    SMB_FLAGS2_READ_IF_EXECUTE = (1 << 13),
 
     /**
      * @brief If this bit is set in a client request, the server MUST return
